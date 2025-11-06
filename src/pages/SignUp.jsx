@@ -9,7 +9,16 @@ function SignUp() {
         harum, numquam, placeat quisquam repellat rerum suscipit ullam vitae. A ab ad assumenda, consequuntur deserunt
         doloremque ea eveniet facere fuga illum in numquam quia reiciendis rem sequi tenetur veniam?</p>
       <form>
-        <p>*Invoervelden*</p>
+          <label htmlFor="username">
+              <input type="text" placeholder="Uw Gebruikersnaam"  id="username" />
+          </label>
+          <label htmlFor="password">
+              <input type="password" placeholder="Uw Wachtwoord" id="password"/>
+          </label>
+          <label htmlFor="comfirm-password">
+              <input type="password" placeholder="Bevestig Wachtwoord" id="comfirm-password"/>
+          </label>
+          <button type="submit">Account aanmaken</button>
       </form>
       <p>Heb je al een account? Je kunt je <Link to="/signin">hier</Link> inloggen.</p>
     </>
