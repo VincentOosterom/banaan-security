@@ -1,58 +1,87 @@
 import React, {useContext, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {AuthContext} from "../context/AuthContext";
+import axios from "axios";
 
 function SignIn() {
-    const {login, isAuth, logout} = useContext(AuthContext);
-    const [username, setUsername] = useState('');
+    const {login} = useContext(AuthContext);
+
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    const handleSubmit = (e) => {
+    async function handleSubmit(e) {
         e.preventDefault();
-        login(email);
-    };
+        setLoading(true);
+        setError("");
 
+        console.log("Ingevulde login:", { email, password });
+
+        try {
+            const response = await axios.post(
+                "https://novi-backend-api-wgsgz.ondigitalocean.app/api/login",
+                {
+                    email: email,
+                    password: password,
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "novi-education-project-id": "d6200c4d-2a0a-435d-aba6-6171c6a7296e"
+                    },
+                }
+            );
+
+            console.log("Login succesvol:", response.data);
+
+            const jwt = response.data.token;
+            login(jwt);
+
+        } catch (e) {
+            console.error("Login fout:", e.response?.data || e);
+            setError("Email of wachtwoord klopt niet");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <>
             <h1>Inloggen</h1>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab alias cum debitis dolor dolore fuga id
-                molestias qui quo unde?</p>
 
             <form onSubmit={handleSubmit}>
 
-                <label htmlFor="username">
+                <label htmlFor="email">
                     <input
-                        type="text"
-                        placeholder="Uw Gebruikersnaam"
-                        id="username"
-                        value={username}
-                        onChange={e => setUsername(e.target.value)}/>
+                        type="email"
+                        placeholder="Uw e-mailadres"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
                 </label>
 
                 <label htmlFor="password">
                     <input
                         type="password"
-                        placeholder="Uw Wachtwoord"
+                        placeholder="Uw wachtwoord"
                         id="password"
                         value={password}
-                        onChange={e => setPassword(e.target.value)}/>
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
                 </label>
 
-                <div>
-                    {isAuth === false ? (
-                        <>
-                            <button type="button" onClick={login}>Inloggen</button>
-                        </>
-                    ) : (
-                        <>
-                            <button type="button" onClick={logout}>Uitloggen</button>
-                        </>
-                    )}
-                </div>
+                {error && <p style={{color: "red"}}>{error}</p>}
+
+                <button type="submit" disabled={loading}>
+                    {loading ? "Bezig..." : "Inloggen"}
+                </button>
             </form>
 
-            <p>Heb je nog geen account <Link to="/signup">Registreer</Link> je dan eerst.</p>
+            <p>Heb je nog geen account? <Link to="/signup">Registreer je hier</Link>.</p>
         </>
     );
 }
